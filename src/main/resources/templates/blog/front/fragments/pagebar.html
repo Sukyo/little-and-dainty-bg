@@ -1,0 +1,45 @@
+<nav th:fragment="pageBar"  th:if="${page!=null && page.pages gt 1}" id="pageBar">
+    <ul class="pager page-btn" th:data-url="${#httpServletRequest.getScheme() + '://' + #httpServletRequest.getServerName() + ':' + #request.getServerPort()  + #request.getContextPath() + '/' + pageUrl}">
+       <li><a zjax th:href="${#httpServletRequest.getScheme() + '://' + #httpServletRequest.getServerName() + ':' + #request.getServerPort()  + #request.getContextPath() + '/' + pageUrl+'/'+page.prePage}" th:class="${page.hasPreviousPage == true ? 'pointer' : 'pointer btn disabled'}" ><i class="fa fa-angle-double-left"></i></a></li>
+        <span id="pageNo">
+        </span>
+        <li><a zjax th:href="${#httpServletRequest.getScheme() + '://' + #httpServletRequest.getServerName() + ':' + #request.getServerPort()  + #request.getContextPath() + '/' + pageUrl+'/'+page.nextPage}" th:class="${page.hasNextPage == true ? 'pointer' : 'pointer btn disabled'}"><i class="fa fa-angle-double-right"></i></a></li>
+    </ul>
+
+    <script>
+        $(function () {
+            var pages=[[${page.pages}]];
+            var dataUrl=$("#pageBar>.pager").attr("data-url");
+            if(pages>1){
+                var currentPage = [[${page.pageNum}]];
+                var pageHtml="";
+                var pageArr = [];//盛放当前显示的所有页码的数组
+                if(pages < 11){//总页数小于11页的情况
+                    var pageArr = [];
+                    for(var i = 0;i<pages;i++){
+                        pageArr.push(i+1);
+                    }
+                }else if(currentPage > 5 && (pages - currentPage) > 3){//当前页大于5且总页数减当前页大于3
+                    pageArr = [currentPage-5,currentPage-4,currentPage-3,currentPage-2,currentPage-1,currentPage,currentPage+1,currentPage+2,currentPage+3,currentPage+4]
+                }else if(currentPage > 5 && pages - currentPage < 4){//当前页大于5且总页数减当前页小于4
+                    pageArr = [pages-9,pages-8,pages-7,pages-6,pages-5,pages-4,pages-3,pages-2,pages-1,pages]
+                }else if(currentPage<6 && pages > 9){//当前页小于6且总页数大于9
+                    var pageArr = [];
+                    for(var i = 0;i<10;i++){
+                        pageArr.push(i+1);
+                    }
+                }
+                for(var h=0;h<pageArr.length;h++){
+                    if(pageArr[h]==currentPage){
+                        pageHtml+='<li><a class="pointer active" zjax href="'+dataUrl+'/'+pageArr[h]+'" >'+pageArr[h]+'</a></li>';
+                    }else{
+                        pageHtml+='<li><a class="pointer"  zjax href="'+dataUrl+'/'+pageArr[h]+'" >'+pageArr[h]+'</a></li>';
+                    }
+                }
+                $("#pageNo").append(pageHtml);
+            }
+
+        })
+
+    </script>
+</nav>

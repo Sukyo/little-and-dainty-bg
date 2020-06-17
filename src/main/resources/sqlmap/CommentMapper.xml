@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suk.blog.mapper.CommentMapper">
+    
+    <resultMap type="Comment" id="CommentResult">
+        <result property="id"    column="id"    />
+        <result property="sid"    column="sid"    />
+        <result property="userId"    column="user_id"    />
+        <result property="pid"    column="pid"    />
+        <result property="qq"    column="qq"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="email"    column="email"    />
+        <result property="url"    column="url"    />
+        <result property="status"    column="status"    />
+        <result property="ip"    column="ip"    />
+        <result property="lng"    column="lng"    />
+        <result property="lat"    column="lat"    />
+        <result property="address"    column="address"    />
+        <result property="os"    column="os"    />
+        <result property="osShortName"    column="os_short_name"    />
+        <result property="browser"    column="browser"    />
+        <result property="browserShortName"    column="browser_short_name"    />
+        <result property="content"    column="content"    />
+        <result property="remark"    column="remark"    />
+        <result property="support"    column="support"    />
+        <result property="oppose"    column="oppose"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="loveCount" jdbcType="INTEGER" column="love_count"/>
+        <association property="parent" javaType="com.suk.blog.entity.Comment">
+            <result property="id" jdbcType="INTEGER" column="parent_id"/>
+            <result property="nickname" jdbcType="VARCHAR" column="parent_nickname"/>
+            <result property="content" jdbcType="VARCHAR" column="parent_content"/>
+        </association>
+        <association property="article" javaType="com.suk.blog.entity.ArticleCopy">
+            <result property="id" jdbcType="INTEGER" column="article_id"/>
+            <result property="title" jdbcType="VARCHAR" column="article_title"/>
+        </association>
+    </resultMap>
+
+    <select id="selectComments" parameterType="com.suk.blog.entity.vo.CommentConditionVo" resultMap="CommentResult">
+        SELECT
+        t.*,
+        f.id AS parent_id,
+        f.nickname AS parent_nickname,
+        f.content AS parent_content,
+        a.id AS article_id,
+        a.title AS article_title,
+        IFNULL(love.love_count,0) AS love_count
+        FROM
+        biz_comment t
+        LEFT JOIN biz_comment f ON t.pid = f.id
+        LEFT JOIN biz_article a ON a.id = t.sid
+        LEFT JOIN (
+        SELECT
+        l.biz_id,
+        count(1) AS love_count
+        FROM
+        biz_love l
+        WHERE l.biz_type=2 AND l.status=1
+        GROUP BY
+        l.biz_id
+        ) love ON t.id = love.biz_id
+        WHERE
+        1 = 1
+        <if test="userId != null">
+            AND t.user_id = #{userId}
+        </if>
+        <if test="sid != null">
+            AND t.sid = #{sid}
+        </if>
+        <if test="pid != null">
+            AND t.pid = #{pid}
+        </if>
+        <if test="qq != null">
+            AND t.qq = #{qq}
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+        ORDER BY
+        t.create_time DESC
+    </select>
+
+</mapper>

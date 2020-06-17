@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改网站主题')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal" id="form-theme-edit">
+			<input name="id" type="hidden" th:value="${theme.id}">
+			<div class="box-body">
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">主题名称 <span class="red">*</span>:</label>
+					<div class="col-sm-8">
+						<input th:value="${theme.name}" name="name" class="form-control" require="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">主题描述 :</label>
+					<div class="col-sm-8">
+						<input th:value="${theme.description}" name="description" class="form-control">
+					</div>
+				</div>
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">主题图片 :</label>
+					<div class="col-sm-8">
+						<input th:value="${theme.img}" name="img" class="form-control">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "blog/theme";
+		$("#form-theme-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-theme-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

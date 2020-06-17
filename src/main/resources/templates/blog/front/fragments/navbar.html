@@ -1,0 +1,56 @@
+<div th:fragment="top"  class="top-box">
+    <div class="zb-container">
+        <span class="">
+            欢迎访问阿硕的博客！
+        </span>
+    </div>
+</div>
+<nav id ="navbar" th:fragment="navbar" class="navbar navbar-default ">
+    <div class="zb-container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="sr-only">
+								Toggle navigation
+							</span>
+                <span class="icon-bar">
+							</span>
+                <span class="icon-bar">
+							</span>
+                <span class="icon-bar">
+							</span>
+            </button>
+            <a class="logo-a" href="/">
+                <img src="/logo.png" alt="logo" />
+            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-right" aria-expanded="false">
+            <ul class="nav navbar-nav">
+                <li th:class="${categoryId=='index' ? 'active' : ''} ">
+                    <a th:href="@{/}">
+                        首页
+                    </a>
+                </li>
+                <li th:each="category:${@module.get('categoryList')}" th:class="${category.id==categoryId ? 'active':(#lists.isEmpty(category.nodes)?'':'dropdown')}">
+                    <a th:if="${category.pid==null||category.pid==0}" th:href="@{${not #lists.isEmpty(category.nodes)? '#': ('/suk/category/' + category.id)}}" th:class="${#lists.isEmpty(category.nodes)?'':'dropdown-toggle'}" th:data-toggle="${#lists.isEmpty(category.nodes)?'':'dropdown'}">
+                        <span th:text="${category.name}"></span>
+                        <b th:if="${not #lists.isEmpty(category.nodes)}" class="caret"></b>
+                    </a>
+                    <ul th:if="${not #lists.isEmpty(category.nodes)}" class="dropdown-menu">
+                        <li th:each="node:${category.nodes}"><a th:href="@{${'/suk/category/' + node.id}}" th:text="${node.name}"></a></li>
+                    </ul>
+
+                </li>
+                <li class="">
+                    <a href="/suk/comment" th:class="${categoryId=='comment' ? 'active' : ''} ">
+                        留言板
+                    </a>
+                </li>
+                <li class="">
+                    <a href="/login">
+                        登录
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改文章分类')" />
+</head>
+<section class="content">
+	<div id="categoryLayer" style="display: none;padding: 20px;">
+		<table id="p-table"></table>
+	</div>
+</section>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-category-edit">
+			<input name="id" type="hidden" th:value="${category.id}">
+			<input id="d-pid"  name="pid" type="hidden" th:value="${category.pid}">
+			<div class="box-body">
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">上级分类 <span class="red">*</span>:</label>
+					<div class="col-sm-8">
+						<input id="d-pname"  th:value="${category.parent==null?'无':category.parent.name}"  class="form-control cursor-pointer" onclick="showCategory(2)" readonly="readonly" require="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">分类名称 <span class="red">*</span>:</label>
+					<div class="col-sm-8">
+						<input th:value="${category.name}" name="name" class="form-control" require="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">分类描述 <span class="red">*</span>:</label>
+					<div class="col-sm-8">
+						<input th:value="${category.description}" name="description" class="form-control" require="">
+					</div>
+				</div>
+				<div class="form-group">
+					<label  class="col-sm-3 control-label">排序 <span class="red">*</span>:</label>
+					<div class="col-sm-8">
+						<input th:value="${category.sort}" name="sort" class="form-control" require="" plusinteger="">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "blog/category";
+
+		$("#form-category-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-category-edit').serialize());
+	        }
+	    }
+
+        function selectSingleData(id){
+            var selectContent = $(id).bootstrapTable('getSelections');
+            if(typeof(selectContent) == 'undefined' || selectContent == "") {
+                layer.msg("请先选择一条数据!");
+                return false;
+            }else if(selectContent.length > 1){
+                layer.msg("只能选择一条数据!");
+                return false;
+            }else{
+                var selectData = selectContent[0];
+                return selectData;
+            }
+        }
+
+        /*加载一级分类*/
+        function showCategory(flag) {
+            $.post(prefix + "/listAll", {isFistLevel: true}, function (data) {
+                if ($("#p-table").children().length > 0) {
+                    $('#p-table').bootstrapTable('load', data);
+                } else {
+                    $('#p-table').bootstrapTable({
+                        columns: [{radio: true},
+                            {
+                                field: 'name',
+                                title: '分类名称',
+                                align: "center"
+                            }, {
+                                field: 'sort',
+                                title: '排序',
+                                align: "center",
+                            }],
+                        data: data,
+                        cache: false,
+                        clickToSelect: true
+                    });
+                }
+
+                layer.open({
+                    type: 1,
+                    offset: '50px',
+                    skin: 'layui-layer-molv',
+                    title: "选择分类",
+                    area: ['300px', '450px'],
+                    content: jQuery("#categoryLayer"),
+                    btn: ['确定', '取消'],
+                    btn1: function (index) {
+                        var result = selectSingleData("#p-table");
+                        if (result) {
+                            if (flag == 1) {
+                                $("#pid").val(result.id);
+                                $("#pname").val(result.name);
+                            } else {
+                                $("#d-pid").val(result.id);
+                                $("#d-pname").val(result.name);
+                            }
+                            layer.close(index);
+                        }
+                    }
+                });
+            })
+        }
+	</script>
+</body>
+</html>

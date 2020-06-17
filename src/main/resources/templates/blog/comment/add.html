@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增文章评论')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-comment-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">被评论的文章或者页面的ID(-1:留言板)：</label>
+				<div class="col-sm-8">
+					<input id="sid" name="sid" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的ID：</label>
+				<div class="col-sm-8">
+					<input id="userId" name="userId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">父级评论的id：</label>
+				<div class="col-sm-8">
+					<input id="pid" name="pid" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的QQ（未登录用户）：</label>
+				<div class="col-sm-8">
+					<input id="qq" name="qq" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的昵称（未登录用户）：</label>
+				<div class="col-sm-8">
+					<input id="nickname" name="nickname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的头像地址：</label>
+				<div class="col-sm-8">
+					<input id="avatar" name="avatar" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的邮箱地址（未登录用户）：</label>
+				<div class="col-sm-8">
+					<input id="email" name="email" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论人的网站地址（未登录用户）：</label>
+				<div class="col-sm-8">
+					<input id="url" name="url" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论的状态：</label>
+				<div class="col-sm-8">
+					<input id="status" name="status" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的ip：</label>
+				<div class="col-sm-8">
+					<input id="ip" name="ip" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">经度：</label>
+				<div class="col-sm-8">
+					<input id="lng" name="lng" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">纬度：</label>
+				<div class="col-sm-8">
+					<input id="lat" name="lat" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的地址：</label>
+				<div class="col-sm-8">
+					<input id="address" name="address" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的系统类型：</label>
+				<div class="col-sm-8">
+					<input id="os" name="os" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的系统的简称：</label>
+				<div class="col-sm-8">
+					<input id="osShortName" name="osShortName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的浏览器类型：</label>
+				<div class="col-sm-8">
+					<input id="browser" name="browser" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论时的浏览器的简称：</label>
+				<div class="col-sm-8">
+					<input id="browserShortName" name="browserShortName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">评论的内容：</label>
+				<div class="col-sm-8">
+					<input id="content" name="content" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注（审核不通过时添加）：</label>
+				<div class="col-sm-8">
+					<input id="remark" name="remark" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">支持（赞）：</label>
+				<div class="col-sm-8">
+					<input id="support" name="support" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">反对（踩）：</label>
+				<div class="col-sm-8">
+					<input id="oppose" name="oppose" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">添加时间：</label>
+				<div class="col-sm-8">
+					<input id="createTime" name="createTime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">更新时间：</label>
+				<div class="col-sm-8">
+					<input id="updateTime" name="updateTime" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "blog/comment"
+		$("#form-comment-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-comment-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

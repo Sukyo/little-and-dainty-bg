@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('文章评论列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <div class="col-md-3 col-sm-6">
+                        <label class="control-label  col-xs-4">状态:</label>
+                        <div class="col-xs-8">
+                            <select id="status" class="form-control" name="status">
+                                <option value="">请选择</option>
+                                <option value="0">待审核</option>
+                                <option value="1">审核通过</option>
+                                <option value="2">审核失败</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <li>
+                        <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                class="fa fa-search"></i>&nbsp;搜索</a>
+                        <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                class="fa fa-refresh"></i>&nbsp;重置</a>
+                    </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="blog:comment:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()"
+               shiro:hasPermission="blog:comment:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>-->
+            <a class="btn btn-danger btn-del disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="blog:comment:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="blog:comment:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<!-- 回复评论模态框 -->
+<div id="replyCommentModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">回复评论</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="replyForm">
+                    <input id="replyPid" name="pid" type="hidden">
+                    <input id="replySid" name="sid" type="hidden">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <textarea id="replyArea" name="content"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="pull-right">
+                            <button type="button" id="saveReply" class="btn btn-info">确定</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 审核评论模态框 -->
+<div id="auditCommentModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">审核评论</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="auditForm">
+                    <input id="auditId" name="id" type="hidden">
+                    <input id="auditSid" name="sid" type="hidden">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">审核状态 :</label>
+                            <div class="col-sm-8">
+                                <select name="status" class="form-control" require="必填项">
+                                    <option value="1">审核通过</option>
+                                    <option value="2">审核失败</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="">回复内容:</label>
+                            <div class="col-sm-8">
+                                <textarea id="auditArea" name="replyContent"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="pull-right">
+                            <button type="button" id="saveAudit" class="btn btn-info">确定</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var auditFlag = [[${@permission.hasPermi('blog:comment:audit')}]];
+    var removeFlag = [[${@permission.hasPermi('blog:comment:remove')}]];
+    var prefix = ctx + "blog/comment";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "文章评论",
+            showExport: true,
+            columns: [
+                {checkbox: true},
+                {
+                    field: 'id',
+                    title: 'ID',
+                    visible: false
+                },
+                {
+                    field: 'nickname',
+                    title: '作者',
+                    align: "left",
+                    formatter: function (value, row) {
+                        return value;
+                    }
+                }, {
+                    field: 'qq',
+                    title: 'QQ',
+                    align: "center"
+                }, {
+                    field: 'email',
+                    title: '邮箱',
+                    align: "center"
+                }, {
+                    field: 'ip',
+                    title: 'ip',
+                    align: "center",
+                }, {
+                    field: 'sid',
+                    title: '文章标题/留言板',
+                    align: "center",
+                    formatter: function (value, row) {
+                        if (value == -1) {
+                            return '<span class="red">留言板</span>'
+                        } else {
+                            if (row.article != null && row.article.title != "") {
+                                return '<span class="color-2c93fd">' + (row.article.title.length <= 15 ? row.article.title : (row.article.title.substring(0, 15) + '...')) + '</span>';
+                            }else {
+                                return '<span class="red">系统回复</span>'
+                            }
+                        }
+                    }
+                }, {
+                    field: 'content',
+                    title: '内容',
+                    align: "left",
+                    formatter: function (value, row) {
+                        var rtn = value;
+                        if (row.parent != null) {
+                            rtn += '<div class="comment-parent">原评：' + row.parent.content + '</div>'
+                        }
+                        return rtn;
+                    }
+                }, {
+                    field: 'support',
+                    title: '赞/踩',
+                    align: "center",
+                    formatter: function (value, row) {
+                        return row.loveCount + '/' + row.oppose
+                    }
+                }, {
+                    field: 'status',
+                    title: '状态',
+                    align: "center",
+                    formatter: function (value) {
+                        if (value == 0) {
+                            return '待审核'
+                        } else if (value == 1) {
+                            return '审核通过'
+                        } else if (value == 2) {
+                            return '审核失败'
+                        }
+                    }
+                },
+                {
+                    field: 'operation',
+                    title: '操作',
+                    align: "center",
+                    class: 'min-width-150',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + auditFlag + '" href="javascript:void(0)" onclick="auditComment(\'' + row.id + '\')"><i class="fa fa-edit"></i>审核</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    /*审核*/
+    function auditComment(id, sid) {
+        $("#auditId").val(id);
+        $("#auditSid").val(sid);
+        $("#auditCommentModal").modal("show");
+    }
+
+    /*保存审核*/
+    $("#saveAudit").click(function () {
+        $.post("/blog/comment/audit", $("#auditForm").serialize(), function (data) {
+            if (data.code == '0') {
+                $("#auditCommentModal").modal("hide");
+                $.table.refresh();
+            }
+            layer.msg(data.msg);
+        })
+    });
+
+</script>
+</body>
+</html>

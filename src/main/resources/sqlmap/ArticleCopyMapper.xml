@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suk.blog.mapper.ArticleCopyMapper">
+
+    <resultMap type="ArticleCopy" id="ArticleCopyResult">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="userId" column="user_id"/>
+        <result property="author" column="author"/>
+        <result property="coverImage" column="cover_image"/>
+        <result property="qrcodePath" column="qrcode_path"/>
+        <result property="isMarkdown" column="is_markdown"/>
+        <result property="content" column="content"/>
+        <result property="contentMd" column="content_md"/>
+        <result property="top" column="top"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="status" column="status"/>
+        <result property="recommended" column="recommended"/>
+        <result property="slider" column="slider"/>
+        <result property="sliderImg" column="slider_img"/>
+        <result property="original" column="original"/>
+        <result property="description" column="description"/>
+        <result property="keywords" column="keywords"/>
+        <result property="comment" column="comment"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="lookCount" jdbcType="INTEGER" column="look_count"/>
+        <result property="commentCount" jdbcType="INTEGER" column="comment_count"/>
+        <result property="loveCount" jdbcType="INTEGER" column="love_count"/>
+
+        <association property="category" javaType="com.suk.blog.entity.Category">
+            <result property="id" jdbcType="INTEGER" column="b_category_id"/>
+            <result property="name" jdbcType="VARCHAR" column="b_category_name"/>
+            <result property="description" jdbcType="VARCHAR" column="b_category_description"/>
+        </association>
+        <collection property="tags" column="tag_id" javaType="ArrayList" ofType="com.suk.blog.entity.Tags">
+            <result property="id" jdbcType="INTEGER" column="tag_id"/>
+            <result property="name" jdbcType="VARCHAR" column="tag_name"/>
+            <result property="description" jdbcType="VARCHAR" column="tag_description"/>
+            <result property="createTime" jdbcType="TIMESTAMP" column="tag_create_time"/>
+            <result property="updateTime" jdbcType="TIMESTAMP" column="tag_update_time"/>
+        </collection>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        title,
+        user_id,
+        author,
+        cover_image,
+        qrcode_path,
+        content,
+        top,
+        category_id,
+        status,
+        recommended,
+        slider,
+        sliderImg,
+        original,
+        description,
+        keywords,
+        create_time,
+        update_time
+    </sql>
+
+    <select id="newList" parameterType="ArticleCopy" resultMap="ArticleCopyResult">
+        SELECT
+        a.*,
+        category.id AS b_category_id,
+        category.`name` AS b_category_name,
+        category.description AS b_category_description,
+        l.lookCount AS look_count,
+        c.commentCount AS comment_count,
+        love.loveCount AS love_count
+        FROM
+        biz_article a
+        INNER JOIN biz_category category ON a.category_id = category.id
+        INNER JOIN biz_article_tags atag ON a.id = atag.article_id
+        LEFT JOIN (
+        SELECT
+        l.article_id,
+        IFNULL(count(1), 0) AS lookCount
+        FROM
+        biz_article_look l
+        GROUP BY
+        l.article_id
+        ) l ON a.id = l.article_id
+        LEFT JOIN (
+        SELECT
+        sid,
+        IFNULL(count(1), 0) AS commentCount
+        FROM
+        biz_comment c
+        WHERE c.status = 1
+        GROUP BY
+        sid
+        ) c ON a.id = c.sid
+        LEFT JOIN (
+        SELECT
+        l.biz_id,
+        IFNULL(count(1), 0) AS loveCount
+        FROM
+        biz_love l
+        WHERE l.biz_type=1 and l.status=1
+        GROUP BY
+        l.biz_id
+        ) love ON a.id = love.biz_id
+        WHERE 1 = 1
+        <if test="categoryId != null">
+            AND a.category_id = #{categoryId}
+        </if>
+        <choose>
+            <when test="tagIds != null">
+                AND atag.tag_id IN (
+                <foreach collection="tagIds" item="tagId" separator=",">
+                    #{tagId}
+                </foreach>
+                )
+            </when>
+            <otherwise>
+                <if test="tagId != null">
+                    AND atag.tag_id = #{tagId}
+                </if>
+            </otherwise>
+        </choose>
+        <if test="top != null">
+            AND a.top = #{top}
+        </if>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="recommended != null">
+            AND a.recommended = #{recommended}
+        </if>
+        <if test="slider != null">
+            AND a.slider = #{slider}
+        </if>
+        <if test="keywords != null and keywords != '' ">
+            AND
+            (
+            a.title LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.content LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.description LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.keywords LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%')
+            )
+        </if>
+        GROUP BY a.id
+        <choose>
+            <when test="random != null">
+                ORDER BY RAND()
+            </when>
+            <otherwise>
+                ORDER BY
+                <if test="sliderFlag == true">
+                    a.slider DESC,
+                </if>
+                <if test="recentFlag != true">
+                    a.top DESC,
+                </if>
+                a.create_time DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <select id="count" parameterType="ArticleCopy" resultType="long">
+        SELECT count(*) FROM
+        (
+        SELECT
+        a.*,
+        category.id AS b_category_id,
+        category.`name` AS b_category_name,
+        category.description AS b_category_description,
+        l.lookCount AS look_count,
+        c.commentCount AS comment_count,
+        love.loveCount AS love_count
+        FROM
+        biz_article a
+        INNER JOIN biz_category category ON a.category_id = category.id
+        INNER JOIN biz_article_tags atag ON a.id = atag.article_id
+        LEFT JOIN (
+        SELECT
+        l.article_id,
+        IFNULL(count(1), 0) AS lookCount
+        FROM
+        biz_article_look l
+        GROUP BY
+        l.article_id
+        ) l ON a.id = l.article_id
+        LEFT JOIN (
+        SELECT
+        sid,
+        IFNULL(count(1), 0) AS commentCount
+        FROM
+        biz_comment c
+        WHERE c.status = 1
+        GROUP BY
+        sid
+        ) c ON a.id = c.sid
+        LEFT JOIN (
+        SELECT
+        l.biz_id,
+        IFNULL(count(1), 0) AS loveCount
+        FROM
+        biz_love l
+        WHERE l.biz_type=1 and l.status=1
+        GROUP BY
+        l.biz_id
+        ) love ON a.id = love.biz_id
+        WHERE 1 = 1
+        <if test="categoryId != null">
+            AND a.category_id = #{categoryId}
+        </if>
+        <choose>
+            <when test="tagIds != null">
+                AND atag.tag_id IN (
+                <foreach collection="tagIds" item="tagId" separator=",">
+                    #{tagId}
+                </foreach>
+                )
+            </when>
+            <otherwise>
+                <if test="tagId != null">
+                    AND atag.tag_id = #{tagId}
+                </if>
+            </otherwise>
+        </choose>
+        <if test="top != null">
+            AND a.top = #{top}
+        </if>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="recommended != null">
+            AND a.recommended = #{recommended}
+        </if>
+        <if test="slider != null">
+            AND a.slider = #{slider}
+        </if>
+        <if test="keywords != null and keywords != '' ">
+            AND
+            (
+            a.title LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.content LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.description LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%') OR
+            a.keywords LIKE CONCAT('%',#{keywords , jdbcType=VARCHAR},'%')
+            )
+        </if>
+        GROUP BY a.id
+        <choose>
+            <when test="random != null">
+                ORDER BY RAND()
+            </when>
+            <otherwise>
+                ORDER BY
+                <if test="sliderFlag == true">
+                    a.slider DESC,
+                </if>
+                <if test="recentFlag != true">
+                    a.top DESC,
+                </if>
+                a.create_time DESC
+            </otherwise>
+        </choose>
+        )t
+    </select>
+
+    <select id="listTagsByArticleId" parameterType="List" resultMap="ArticleCopyResult">
+        SELECT
+        a.*,
+        t.id AS tag_id,
+        t.`name` AS tag_name,
+        t.description AS tag_description
+        FROM
+        biz_article a
+        INNER JOIN biz_article_tags atag ON a.id = atag.article_id
+        INNER JOIN biz_tags t ON atag.tag_id = t.id
+        WHERE
+        a.id IN (
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+
+    <select id="hotList" resultMap="ArticleCopyResult">
+        SELECT
+        a.*, l.lookCount AS look_count
+        FROM
+        biz_article a
+        LEFT JOIN (
+        SELECT
+        l.article_id,
+        IFNULL(count(1), 0) AS lookCount
+        FROM
+        biz_article_look l
+        GROUP BY
+        l.article_id
+        ) l ON a.id = l.article_id
+        WHERE a.status = 1
+        ORDER BY
+        l.lookCount DESC
+    </select>
+
+    <select id="selectById" parameterType="int" resultMap="ArticleCopyResult">
+        SELECT
+        a.*,
+        category.id AS b_category_id,
+        category.`name` AS b_category_name,
+        category.description AS b_category_description,
+        t.id AS tag_id,
+        t.`name` AS tag_name,
+        t.description AS tag_description,
+        t.create_time AS tag_create_time,
+        t.update_time AS tag_update_time,
+        l.lookCount AS look_count,
+        c.commentCount AS comment_count,
+        love.loveCount AS love_count
+        FROM
+        biz_article a
+        INNER JOIN biz_category category ON a.category_id = category.id
+        INNER JOIN biz_article_tags atag ON a.id = atag.article_id
+        INNER JOIN biz_tags t ON atag.tag_id = t.id
+        LEFT JOIN (
+        SELECT
+        l.article_id,
+        IFNULL(count(1), 0) AS lookCount
+        FROM
+        biz_article_look l
+        GROUP BY
+        l.article_id
+        ) l ON a.id = l.article_id
+        LEFT JOIN (
+        SELECT
+        sid,
+        IFNULL(count(1), 0) AS commentCount
+        FROM
+        biz_comment c
+        WHERE c.status = 1
+        GROUP BY
+        sid
+        ) c ON a.id = c.sid
+        LEFT JOIN (
+        SELECT
+        l.biz_id,
+        IFNULL(count(1), 0) AS loveCount
+        FROM
+        biz_love l
+        WHERE l.biz_type=1 AND l.status=1
+        GROUP BY
+        l.biz_id
+        ) love ON a.id = love.biz_id
+        WHERE
+        a.id = #{id}
+    </select>
+
+
+    <delete id="deleteBatch" parameterType="map">
+        DELETE FROM
+        biz_article
+        where
+        id in
+        <foreach collection="array" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

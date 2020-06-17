@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改友情链接')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal" id="form-link-edit">
+            <input name="id" type="hidden" th:value="${link.id}">
+            <div class="box-body">
+                <div class="form-group">
+                    <label class="control-label col-sm-3">状态: </label>
+                    <div class="col-sm-8">
+                        <label class="radio-inline pr-5"><input th:field="*{link.status}" type="radio" name="status" value="1"> 启用</label>
+                        <label class="radio-inline pr-5"><input th:field="*{link.status}" type="radio" name="status" value="0"> 禁用</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站点名称 <span class="red">*</span>:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.name}" name="name" class="form-control" require="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站点链接 <span class="red">*</span>:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.url}" name="url" class="form-control" require="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站点描述 <span class="red">*</span>:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.description}" name="description" class="form-control" require="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站长图片:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.img}" name="img" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站长邮箱:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.email}" name="email" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">站长QQ:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.qq}" name="qq" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-3 control-label">备注:</label>
+                    <div class="col-sm-8">
+                        <input th:value="${link.remark}" name="remark" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "blog/link";
+		$("#form-link-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-link-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

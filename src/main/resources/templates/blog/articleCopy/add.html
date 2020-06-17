@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('新增资源')"/>
+	<th:block th:include="include :: summernote-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-resource-add">
+		<input id="status" type="hidden" name="status">
+		<div class="col-lg-8 pl0">
+			<div class="form-group">
+				<div class="col-xs-12">
+					<input type="text" class="form-control" id="title" name="title" placeholder="请输入文章标题" require="">
+				</div>
+			</div>
+			<div class="form-group form-editor">
+				<div class="col-xs-12">
+					<input id="content" name="content" type="hidden">
+					<div class="summernote"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-4 article-extra">
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">文章类型:</label>
+					<div class="tags ml80 checkbox icheck">
+						<label>
+							<input class="minimal" type="radio" name="original" checked value="1">原创
+						</label>
+						<label>
+							<input class="minimal" type="radio" name="original" value="0">转载
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12 ">
+					<label class="control-label label-four" for="">文章分类:</label>
+					<div class="ml80">
+						<select name="categoryId" class="form-control m-b">
+							<option th:each="category:${categories}"  th:value="${category.id}" th:text="${category.name}"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">文章标签:</label>
+					<div class="tags checkbox icheck ml80">
+						<label th:each="tag:${tags}">
+							<input class="minimal" type="checkbox" name="tag" th:value="${tag.id}"
+								   th:text="${tag.name}">
+						</label>
+					</div>
+				</div>
+
+			</div>
+			<!--   <div class="form-group">
+                   <div class="col-xs-12">
+                       <label class="control-label label-four" for="">文章简介:</label>
+                       <div class="ml80">
+                           <textarea type="text" rows="3" class="form-control" name="description" require=""></textarea>
+                       </div>
+                   </div>
+               </div>-->
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">文章封面:</label>
+					<div class="ml80" style="position: relative">
+						<input type="text" class="form-control" name="coverImage" id="coverImage" placeholder="文章封面地址"
+							   require="">
+						<div class="jax-upload-btn" style="position: absolute;right: 10px;top: 0">
+							<i class="fa fa-cloud-upload upload-img-btn"></i>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div id="upload-content" class="upload-content form-group"></div>
+			<div id="sliderImgContent" class="form-group display-none">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">轮播图:</label>
+					<div class="ml80" style="position: relative">
+						<input id="sliderImg" type="text" class="form-control" name="sliderImg"
+							   placeholder="轮播图地址（建议800*300）" require="">
+						<div class="jax-upload-btn" style="position: absolute;right: 10px;top: 0">
+							<i class="fa fa-cloud-upload upload-slider-btn"></i>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">是否轮播:</label>
+					<div class="tags ml80 checkbox icheck">
+						<label>
+							<input class="minimal" type="radio" name="slider" value="1">是
+						</label>
+						<label>
+							<input class="minimal" type="radio" name="slider" checked value="0">否
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">是否置顶:</label>
+					<div class="tags ml80 checkbox icheck">
+						<label>
+							<input class="minimal" type="radio" name="top" value="1">是
+						</label>
+						<label>
+							<input class="minimal" type="radio" name="top" checked value="0">否
+						</label>
+					</div>
+				</div>
+
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">是否推荐:</label>
+					<div class="tags ml80 checkbox icheck">
+						<label>
+							<input class="minimal" type="radio" name="recommended" value="1">是
+						</label>
+						<label>
+							<input class="minimal" type="radio" name="recommended" checked value="0">否
+						</label>
+					</div>
+				</div>
+
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">开启评论:</label>
+					<div class="tags ml80 checkbox icheck">
+						<label>
+							<input class="minimal" type="radio" name="comment" checked value="1">是
+						</label>
+						<label>
+							<input class="minimal" type="radio" name="comment" value="0">否
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-4 article-extra mt20">
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">概要:</label>
+					<div class="ml80">
+                        <textarea type="text" rows="2" class="form-control" name="description" require=""
+								  placeholder="文章概要"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-xs-12">
+					<label class="control-label label-four" for="">关键词:</label>
+					<div class="ml80">
+                        <textarea type="text" rows="2" class="form-control" name="keywords" require=""
+								  placeholder="文章关键词（SEO优化）"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="row">
+	<div class="col-sm-offset-4 col-sm-10">
+		<button type="button" class="btn btn-sm btn-primary" onclick="submitHandler(0)"><i class="fa fa-check"></i>保存草稿</button>&nbsp;
+		<button type="button" class="btn btn-sm btn-primary" onclick="submitHandler(1)"><i class="fa fa-check"></i>发布文章</button>&nbsp;
+		<button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: summernote-js"/>
+<script type="text/javascript">
+    var prefix = ctx + "blog/articleCopy";
+
+    $('.summernote').summernote({
+        placeholder: '请输入资源描述',
+        height: 192,
+        lang: 'zh-CN',
+        followingToolbar: false,
+        callbacks: {
+            onImageUpload: function (files) {
+                sendFile(files[0], this);
+            }
+        }
+    });
+
+    // 上传文件
+    function sendFile(file, obj) {
+        var data = new FormData();
+        data.append("file", file);
+        $.ajax({
+            type: "POST",
+            url: ctx + "common/upload",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $(obj).summernote('editor.insertImage', result.url, result.fileName);
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+            },
+            error: function (error) {
+                $.modal.alertWarning("图片上传失败。");
+            }
+        });
+    }
+
+    $("#form-resource-add").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler(status) {
+        if ($.validate.form()) {
+            var sHTML = $('.summernote').summernote('code');
+            $("#content").val(sHTML);
+            $("#status").val(status);
+            var data = $("#form-resource-add").serializeArray();
+            var categoryIds = $.form.selectSelects("categoryId");
+            data.push({"name": "categoryId", "value": categoryIds});
+            $.operate.save(prefix + "/add", data);
+        }
+    }
+
+    function fileUpload() {
+        var type = "file";          //后台接收时需要的参数名称，自定义即可
+        var id = "fileId";            //即input的id，用来寻找值
+        var formData = new FormData();
+        formData.append(type, $("#" + id)[0].files[0]);    //生成一对表单属性
+        $.ajax({
+            type: "POST",           //因为是传输文件，所以必须是post
+            url: ctx + 'common/upload',         //对应的后台处理类的地址
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $("#fileName").val(result.fileName);
+                    $("#fileUrl").val(result.url);
+                    $.modal.alertSuccess("文件上传成功。");
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+.row {
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    margin: 0 !important;
+    padding: 10px 10px;
+}
+
+h3 {
+    margin: 0;
+    padding: 5px;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+    font-size: 18px;
+    color: #333;
+}
+
+.form-group label {
+    width: 100%;
+    font-weight: 400;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.reward-bd {
+    overflow: hidden;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.reward-hd-title {
+    color: #333;
+}
+
+.paytype-zfb img {
+    width: 100%;
+}
+
+ul.pay-items {
+    /*width: 100%;*/
+    display: flex;
+    margin-bottom: 0;
+    padding: 3px;
+}
+
+.pay-items li {
+    flex: 1;
+    height: 100%;
+    color: #333;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.pay-items li:nth-child(2) {
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    border-radius: 0;
+}
+
+.pay-items li h5 {
+    margin: 10px 0 0 0;
+    text-align: center;
+}
+
+.pay-items li p {
+    margin: 10px 0 10px 0;
+    font-size: 12px;
+    text-align: center;
+    color: #777;
+}
+
+.item-money em {
+    color: #0e9aef;
+    font-style: normal;
+}
+
+.pay-items li:hover {
+    background-color: #eee;
+    border-radius: 6px;
+}
+
+.pay-items li.active {
+    border: 1px solid #0e9aef;
+    border-radius: 6px;
+}
+
+.tips {
+    font-size: 12px;
+    color: #777;
+    text-align: center;
+    margin-top: 5px;
+}
+
+ul.qrcode-box {
+    display: none;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    width: 200px;
+    transform: translateX(-50%);
+}
+
+.list-group-item.active {
+    text-align: center;
+}
+
+#qrcode img {
+    margin: 0 auto;
+}
+
+.readOnly {
+    pointer-events: none;
+}

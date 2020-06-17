@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suk.blog.mapper.SysUserMapper">
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id     property="id"       column="id"      />
+        <result property="userName"     column="user_name"    />
+        <result property="email"        column="email"        />
+        <result property="telephone"  column="telephone"  />
+        <result property="sex"          column="sex"          />
+        <result property="avatar"       column="avatar"       />
+        <result property="password"     column="password"     />
+        <result property="salt"         column="salt"         />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+        <result property="loginIp"      column="login_ip"     />
+        <result property="loginDate"    column="login_date"   />
+        <result property="createBy"     column="create_by"    />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateBy"     column="update_by"    />
+        <result property="updateTime"   column="update_time"  />
+        <result property="remark"       column="remark"       />
+        <collection  property="roles"   javaType="java.util.List"        resultMap="RoleResult" />
+    </resultMap>
+
+    <resultMap id="RoleResult" type="SysRole">
+        <id     property="id"       column="id"        />
+        <result property="roleName"     column="role_name"      />
+        <result property="roleKey"      column="role_key"       />
+        <result property="roleSort"     column="role_sort"      />
+        <result property="dataScope"     column="data_scope"    />
+        <result property="status"       column="role_status"    />
+    </resultMap>
+
+    <select id="selectAllocatedList" parameterType="SysUser" resultMap="SysUserResult">
+        select distinct u.id, u.user_name, u.user_name, u.email, u.avatar, u.telephone, u.status, u.create_time
+        from sys_user u
+        left join sys_user_role ur on u.id = ur.user_id
+        left join sys_role r on r.id = ur.role_id
+        where u.del_flag = '0' and r.id = #{roleId}
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="telephone != null and telephone != ''">
+            AND u.telephone like concat('%', #{telephone}, '%')
+        </if>
+    </select>
+
+    <select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
+        select distinct u.id, u.user_name, u.user_name, u.email, u.avatar, u.telephone, u.status, u.create_time
+        from sys_user u
+        left join sys_user_role ur on u.id = ur.user_id
+        left join sys_role r on r.id = ur.role_id
+        where u.del_flag = '0' and (r.id != #{roleId} or r.id IS NULL)
+        and u.id not in (select u.id from sys_user u inner join sys_user_role ur on u.id = ur.user_id and ur.role_id = #{roleId})
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="telephone != null and telephone != ''">
+            AND u.telephone like concat('%', #{telephone}, '%')
+        </if>
+    </select>
+
+</mapper>

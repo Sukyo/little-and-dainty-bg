@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--360浏览器优先以webkit内核解析-->
+    <title>介绍</title>
+    <link rel="shortcut icon" type="image/x-icon" href="http://images.susuk.com.cn/images/favicon.ico"/>
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/animate.min.css" th:href="@{/css/main/animate.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/style.min862f.css" th:href="@{/css/main/style.min862f.css}" rel="stylesheet"/>
+</head>
+
+<body class="gray-bg">
+<div class="row  border-bottom white-bg dashboard-header">
+    <div class="col-sm-4">
+        <h4>本博客技术架构选型：</h4>
+        <ol>
+            <li>核心框架：Spring Boot 2.1.6。</li>
+            <li>安全框架：Apache Shiro 1.4.1。</li>
+            <li>模板引擎：Thymeleaf。</li>
+            <li>持久层框架：MyBatis Plus 3.1.2。</li>
+            <li>数据库连接池：Druid 1.1.9。</li>
+            <li>数据库：Mysql。</li>
+            <li>Excel操作：easypoi-base 3.2.1。</li>
+            <li>工具类：Fastjson、lombok、guava、commons-io</li>
+            <li>更多……</li>
+        </ol>
+    </div>
+
+</div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>更新日志</h5>
+                </div>
+                <div class="ibox-content no-padding">
+                    <div class="panel-body">
+                        <div class="panel-group" id="version">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#version" href="#v1.0">v1.0</a><code
+                                            class="pull-right">2020.6.12</code>
+                                    </h5>
+                                </div>
+                                <div id="v2.0" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <ol>
+                                            <li>springboot + shiro基础权限管理</li>
+                                            <li>网站基础配置管理模块</li>
+                                            <li>文章管理模块</li>
+                                            <li>博客搬家工具</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+    <script type="text/javascript">
+        $('#pay-qrcode').click(function () {
+            var html = $(this).html();
+            parent.layer.open({
+                title: false,
+                type: 1,
+                closeBtn: false,
+                shadeClose: true,
+                area: ['600px', 'auto'],
+                content: html
+            });
+        });
+    </script>
+</body>
+</html>

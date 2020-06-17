@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>打赏UP</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/reward.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/qrcode.min.js"></script>
+    <script src="/libs/layer/layer.min.js"></script>
+</head>
+<body>
+<ul class="list-group qrcode-box">
+    <li class="list-group-item active">扫描二维码完成打赏</li>
+    <li class="list-group-item">
+        <div id="qrcode"></div>
+    </li>
+</ul>
+<div class="container">
+    <div class="row">
+        <h3>打赏者信息</h3>
+        <form action="">
+            <div class="form-group">
+                <label for="customer_name">做好事得留名!</label>
+                <input type="text" class="form-control" required="required" id="customer_name" placeholder="请输入您的姓名或昵称">
+            </div>
+            <div class="form-group">
+                <label for="job_type">大佬是从事什么岗位的?</label>
+                <input type="text" class="form-control" required="required" id="job_type"
+                       placeholder="请输入您的岗位,譬如javaer,phper等">
+            </div>
+            <div class="form-group">
+                <label for="qq">留个qq呗~(主要用于获取头像)</label>
+                <input type="text" class="form-control" required="required" id="qq" placeholder="请输入您的QQ">
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="reward-hd"><h3 class="reward-hd-title">打赏金额</h3></div>
+        <div class="reward-bd">
+            <div class="paytype-zfb"><img src="/img/zfb.jpg" alt=""></div>
+            <ul class="pay-items">
+                <li th:each="payItem : ${payItems}">
+                    <h5 class="item-money">￥<em th:attr="data-rmb=${payItem.payMoney}/100"
+                                                th:text="${payItem.payMoney}/100"></em></h5>
+                    <p class="item-description" th:text="${payItem.payDescription}"></p>
+                </li>
+            </ul>
+        </div>
+        <button type="button" class="btn btn-primary btn-lg btn-block btn-reward">打赏</button>
+        <p class="tips">*请放心以上填写的信息,UP会对其严格保密,保证您的隐私安全</p>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".pay-items").children('li').on("click", function (e) {
+            $(".pay-items").children('li').removeClass("active");
+            $(this).addClass("active");
+        });
+        //请求支付
+        $(".btn-reward").on("click", function () {
+            //判断用户是否填写资料和金额
+            if (validate()) {
+                $(this).text("正在打赏中...");
+                $(this).prop("disabled", true);
+                //打赏者信息
+                var rewardInfo = {
+                    customerName: $("#customer_name").val(),
+                    customerJobType: $("#job_type").val(),
+                    customerFacePic: $("#qq").val(),
+                    customerPayMoney: ($("li[class='active']").find("em").attr("data-rmb")) * 100
+                };
+                sessionStorage.setItem("rewardInfo", JSON.stringify(rewardInfo));
+                //请求打赏
+                $.ajax({
+                    url: "/alipay/precreate/" + rewardInfo.customerPayMoney,
+                    type: "POST",
+                    async: false,
+                    success: function (data) {
+                        if (data.code == '0') {
+                            sessionStorage.setItem("orderNo", data.data.id);
+                            new QRCode(document.getElementById("qrcode"), {
+                                text: data.data.qrCode,
+                                width: 160,
+                                height: 160
+                            });
+                            $(".qrcode-box").css("display", "block");
+                            $("body").addClass("readOnly");
+                            judgeState();
+                        } else {
+                            if (data.code == 500) {
+                                $(".btn-reward").prop("disabled", false);
+                                $(".btn-reward").text("打赏");
+                                layer.alert('请求打赏出错啦! 错误码:' + data.code + ",错误信息:" + data.msg, {icon: 2});
+                            }
+                        }
+                    },
+                    error: function (data) {
+
+                    }
+                })
+            } else {
+                layer.alert("您还未完善信息!", {icon: 0});
+            }
+
+        });
+
+        function validate() {
+            var isSelect = $(".pay-items>li").hasClass("active");
+            var isEmpy = $("#customer_name").val().trim() != "" && $("#job_type") && $("#qq").val().trim() != "";
+            return isSelect && isEmpy;
+        }
+
+        //查询打赏状态并更新
+        function judgeState() {
+            var rewardVo = JSON.stringify({
+                orderNo: sessionStorage.getItem("orderNo"),
+                customer: JSON.parse(sessionStorage.getItem("rewardInfo"))
+            });
+            $.ajax({
+                url: "/alipay/query",
+                type: 'POST',
+                data: rewardVo,
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.code != 500) {
+                        if (data.data == 1) {
+                            $(".btn-reward").prop("disabled", false);
+                            $(".btn-reward").text("打赏成功");
+                            layer.alert("打赏成功!感谢大佬的支持!UP会更加努力的!给您比♥♥~", {icon: 6}, function () {
+                                parent.layer.close(parent.layer.getFrameIndex(window.name));
+                            });
+                        }
+                    } else {
+                        //每隔一秒轮询一次
+                        setTimeout(function () {
+                            judgeState();
+                        }, 1000);
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+
+</html>

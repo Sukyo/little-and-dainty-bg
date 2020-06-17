@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suk.blog.mapper.SiteInfoMapper">
+
+    <resultMap type="SiteInfo" id="SiteInfoResult">
+        <result property="id" column="id"/>
+        <result property="siteName" column="site_name"/>
+        <result property="siteDesc" column="site_desc"/>
+        <result property="sitePic" column="site_pic"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="getSiteInfo" resultType="map">
+        SELECT
+        a.article_count AS articleCount,
+        t.tag_count AS tagCount,
+        category.category_count AS categoryCount,
+        c.comment_count AS commentCount
+        FROM
+        (
+        SELECT
+        COUNT(1) AS article_count
+        FROM
+        biz_article
+        WHERE `status` = 1
+        ) a,
+        (
+        SELECT
+        COUNT(1) AS tag_count
+        FROM
+        biz_tags
+        ) t,
+        (
+        SELECT
+        COUNT(1) AS category_count
+        FROM
+        biz_category
+        WHERE status = 1
+        ) category,
+        (
+        SELECT
+        COUNT(1) AS comment_count
+        FROM
+        biz_comment
+        WHERE `status` = 1
+        ) c
+    </select>
+</mapper>
